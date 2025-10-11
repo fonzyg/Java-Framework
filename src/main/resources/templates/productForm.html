@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Product Form</title>
+</head>
+<body>
+<form th:action="@{/product/save}" th:object="${product}" method="post">
+    <!-- Add other fields as needed, e.g., for name and price -->
+    <label>Name</label>
+    <input type="text" th:field="*{name}" />
+    <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name error</span>
+
+    <label>Price</label>
+    <input type="number" th:field="*{price}" />
+    <span th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Price error</span>
+
+    <label>Inventory</label>
+    <input type="number" th:field="*{inv}" />
+    <span th:if="${#fields.hasErrors('inv')}" th:errors="*{inv}">Inventory error</span>
+
+    <!-- Add parts association section if needed, e.g., a table to add/remove parts -->
+
+    <button type="submit">Save</button>
+</form>
+</body>
+</html>
