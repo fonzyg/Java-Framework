@@ -3,118 +3,151 @@ package com.example.inventory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.Errors;
 
 import com.example.inventory.entity.Part;
-import com.example.inventory.validation.InventoryValidator;
 
 public class PartTest {
 
-    private InventoryValidator validator;
-    private Part part;
-    private Errors errors;
-
-    @BeforeEach
-    public void setUp() {
-        validator = new InventoryValidator();
-        part = new Part();
-        errors = new BeanPropertyBindingResult(part, "part");
+    @Test
+    public void testValidInventoryWithinRange() {
+        Part part = new Part();
+        part.setName("Test Part");
+        part.setPrice(10.0);
+        part.setInv(50);
+        part.setMinInv(10);
+        part.setMaxInv(100);
+        
+        assertTrue(part.isInventoryValid());
+        assertTrue(part.isMinMaxValid());
     }
 
     @Test
-    public void testValidPartWithinMinMaxRange() {
-        part.setName("Test Engine");
-        part.setPrice(1500.00);
-        part.setInv(15);
-        part.setMin(10);
-        part.setMax(20);
-
-        validator.validate(part, errors);
-
-        assertFalse(errors.hasErrors(), "Valid part should not have validation errors");
-        assertEquals(0, errors.getErrorCount(), "Error count should be zero for valid part");
-    }
-
-    @Test
-    public void testInvalidPartInventoryBelowMinimum() {
-        part.setName("Test Brake Pad");
-        part.setPrice(45.00);
+    public void testInvalidInventoryBelowMinimum() {
+        Part part = new Part();
+        part.setName("Test Part");
+        part.setPrice(10.0);
         part.setInv(5);
-        part.setMin(10);
-        part.setMax(50);
-
-        validator.validate(part, errors);
-
-        assertTrue(errors.hasErrors(), "Part with inventory below minimum should have validation errors");
-        assertTrue(errors.hasFieldErrors("inv"), "Should have field error for inventory");
-        assertEquals("inv.below.min", errors.getFieldError("inv").getCode(),
-                "Error code should match expected validation error");
+        part.setMinInv(10);
+        part.setMaxInv(100);
+        
+        assertFalse(part.isInventoryValid());
+        assertTrue(part.isMinMaxValid());
     }
 
     @Test
-    public void testInvalidPartInventoryAboveMaximum() {
-        part.setName("Test Oil Filter");
-        part.setPrice(12.50);
-        part.setInv(250);
-        part.setMin(20);
-        part.setMax(200);
-
-        validator.validate(part, errors);
-
-        assertTrue(errors.hasErrors(), "Part with inventory above maximum should have validation errors");
-        assertTrue(errors.hasFieldErrors("inv"), "Should have field error for inventory");
-        assertEquals("inv.above.max", errors.getFieldError("inv").getCode(),
-                "Error code should match expected validation error");
+    public void testInvalidInventoryAboveMaximum() {
+        Part part = new Part();
+        part.setName("Test Part");
+        part.setPrice(10.0);
+        part.setInv(150);
+        part.setMinInv(10);
+        part.setMaxInv(100);
+        
+        assertFalse(part.isInventoryValid());
+        assertTrue(part.isMinMaxValid());
     }
 
     @Test
-    public void testInvalidMinimumGreaterThanMaximum() {
-        part.setName("Test Transmission");
-        part.setPrice(2500.00);
+    public void testInvalidMinGreaterThanMax() {
+        Part part = new Part();
+        part.setName("Test Part");
+        part.setPrice(10.0);
+        part.setInv(50);
+        part.setMinInv(100);
+        part.setMaxInv(50);
+        
+        assertFalse(part.isMinMaxValid());
+    }
+
+    @Test
+    public void testInventoryValidationWithNullValues() {
+        Part part = new Part();
+        part.setName("Test Part");
+        part.setPrice(10.0);
+        part.setInv(null);
+        part.setMinInv(10);
+        part.setMaxInv(100);
+        
+        assertTrue(part.isInventoryValid());
+    }
+
+    @Test
+    public void testMinMaxValidationWithNullValues() {
+        Part part = new Part();
+        part.setName("Test Part");
+        part.setPrice(10.0);
+        part.setInv(50);
+        part.setMinInv(null);
+        part.setMaxInv(100);
+        
+        assertTrue(part.isMinMaxValid());
+    }
+
+    @Test
+    public void testValidInventoryAtBoundaries() {
+        Part part = new Part();
+        part.setName("Test Part");
+        part.setPrice(10.0);
+        part.setMinInv(10);
+        part.setMaxInv(100);
+        
+        // Test at minimum boundary
         part.setInv(10);
-        part.setMin(30);
-        part.setMax(20);
-
-        validator.validate(part, errors);
-
-        assertTrue(errors.hasErrors(), "Part with min > max should have validation errors");
-        assertTrue(errors.hasFieldErrors("min"), "Should have field error for minimum");
-        assertEquals("min.greater.than.max", errors.getFieldError("min").getCode(),
-                "Error code should match expected validation error");
+        assertTrue(part.isInventoryValid());
+        
+        // Test at maximum boundary
+        part.setInv(100);
+        assertTrue(part.isInventoryValid());
+        
+        assertTrue(part.isMinMaxValid());
     }
 
     @Test
-    public void testInvalidNegativePrice() {
-        part.setName("Test Alternator");
-        part.setPrice(-100.00);
-        part.setInv(15);
-        part.setMin(10);
-        part.setMax(30);
+    public void testPartConstructorWithAllParameters() {
+        Part part = new Part("Engine Oil", 25.99, 75, 20, 150);
+        
+        assertEquals("Engine Oil", part.getName());
+        assertEquals(25.99, part.getPrice());
+        assertEquals(75, part.getInv());
+        assertEquals(20, part.getMinInv());
+        assertEquals(150, part.getMaxInv());
+        
+        assertTrue(part.isInventoryValid());
+        assertTrue(part.isMinMaxValid());
+    }
 
-        validator.validate(part, errors);
-
-        assertTrue(errors.hasErrors(), "Part with negative price should have validation errors");
-        assertTrue(errors.hasFieldErrors("price"), "Should have field error for price");
-        assertEquals("price.not.positive", errors.getFieldError("price").getCode(),
-                "Error code should match expected validation error");
+    @Test 
+    public void testMinimumInventoryValidation() {
+        Part part = new Part();
+        part.setName("Test Part");
+        part.setPrice(15.0);
+        part.setMinInv(5);
+        part.setMaxInv(50);
+        
+        // Test inventory below minimum
+        part.setInv(3);
+        assertFalse(part.isInventoryValid(), "Inventory below minimum should be invalid");
+        
+        // Test inventory at minimum
+        part.setInv(5);
+        assertTrue(part.isInventoryValid(), "Inventory at minimum should be valid");
     }
 
     @Test
-    public void testInvalidEmptyPartName() {
-        part.setName("");
-        part.setPrice(50.00);
-        part.setInv(15);
-        part.setMin(10);
-        part.setMax(30);
-
-        validator.validate(part, errors);
-
-        assertTrue(errors.hasErrors(), "Part with empty name should have validation errors");
-        assertTrue(errors.hasFieldErrors("name"), "Should have field error for name");
-        assertEquals("name.empty", errors.getFieldError("name").getCode(),
-                "Error code should match expected validation error");
+    public void testMaximumInventoryValidation() {
+        Part part = new Part();
+        part.setName("Test Part");
+        part.setPrice(20.0);
+        part.setMinInv(5);
+        part.setMaxInv(50);
+        
+        // Test inventory above maximum
+        part.setInv(55);
+        assertFalse(part.isInventoryValid(), "Inventory above maximum should be invalid");
+        
+        // Test inventory at maximum
+        part.setInv(50);
+        assertTrue(part.isInventoryValid(), "Inventory at maximum should be valid");
     }
 }

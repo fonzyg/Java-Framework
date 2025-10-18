@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Part - Alfonso's Auto Parts Shop</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; }
+        h1 { color: #007bff; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .error { color: red; margin-top: 5px; }
+        .alert-error { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add New Part</h1>
+        
+        <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+        
+        <form th:action="@{/parts/add}" th:object="${part}" method="post">
+            <div class="form-group">
+                <label for="name">Part Name:</label>
+                <input type="text" id="name" th:field="*{name}" required>
+                <div class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="price">Price:</label>
+                <input type="number" id="price" th:field="*{price}" step="0.01" min="0.01" required>
+                <div class="error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="inv">Current Inventory:</label>
+                <input type="number" id="inv" th:field="*{inv}" min="0" required>
+                <div class="error" th:if="${#fields.hasErrors('inv')}" th:errors="*{inv}"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="minInv">Minimum Inventory:</label>
+                <input type="number" id="minInv" th:field="*{minInv}" min="0" required>
+                <div class="error" th:if="${#fields.hasErrors('minInv')}" th:errors="*{minInv}"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="maxInv">Maximum Inventory:</label>
+                <input type="number" id="maxInv" th:field="*{maxInv}" min="1" required>
+                <div class="error" th:if="${#fields.hasErrors('maxInv')}" th:errors="*{maxInv}"></div>
+            </div>
+            
+            <div>
+                <button type="submit" class="btn btn-primary">Add Part</button>
+                <a href="/mainscreen" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

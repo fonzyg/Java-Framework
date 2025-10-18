@@ -1,46 +1,65 @@
-package com.example.inventory.entity; // Package declaration for entity classes
-
-import java.util.HashSet; // Import for HashSet collection implementation
-import java.util.Set; // Import for Set interface
-
-public class Part { // Entity class representing a part in the inventory system
-    private Long id; // Unique identifier for the part
-    private String name; // Name or description of the part
-    private double price; // Price of the part in dollars
-    private int inv; // Current inventory count of this part
-    private int min; // Minimum allowed inventory level for this part
-    private int max; // Maximum allowed inventory level for this part
-    private Set<Product> products = new HashSet<>(); // Set of products that use this part
-
-    public Part() {} // Default no-argument constructor for object instantiation
-
-    public Part(String name, double price, int inv, int min, int max) { // Parameterized constructor for creating parts with initial values
-        this.name = name; // Sets the part name from the provided parameter
-        this.price = price; // Sets the part price from the provided parameter
-        this.inv = inv; // Sets the current inventory from the provided parameter
-        this.min = min; // Sets the minimum inventory level from the provided parameter
-        this.max = max; // Sets the maximum inventory level from the provided parameter
+package com.example.inventory.entity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+@Entity
+@Table(name = "parts")
+public class Part {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @NotBlank(message = "Part name is required")
+    @Size(min = 1, max = 50, message = "Part name must be between 1 and 50 characters")
+    private String name;
+    @DecimalMin(value = "0.01", message = "Price must be greater than $0.00")
+    @NotNull(message = "Price is required")
+    private Double price;
+    @Min(value = 0, message = "Inventory cannot be negative")
+    @NotNull(message = "Current inventory is required")
+    private Integer inv;
+    @Min(value = 0, message = "Minimum inventory cannot be negative")
+    @NotNull(message = "Minimum inventory is required")
+    private Integer minInv;
+    @Min(value = 1, message = "Maximum inventory must be at least 1")
+    @NotNull(message = "Maximum inventory is required")
+    private Integer maxInv;
+    public Part() {}
+    public Part(String name, Double price, Integer inv, Integer minInv, Integer maxInv) {
+        this.name = name;
+        this.price = price;
+        this.inv = inv;
+        this.minInv = minInv;
+        this.maxInv = maxInv;
     }
-
-    // Getter and setter methods for accessing and modifying private fields
-    public Long getId() { return id; } // Returns the unique identifier of the part
-    public void setId(Long id) { this.id = id; } // Sets the unique identifier of the part
-    
-    public String getName() { return name; } // Returns the name of the part
-    public void setName(String name) { this.name = name; } // Sets the name of the part
-    
-    public double getPrice() { return price; } // Returns the price of the part
-    public void setPrice(double price) { this.price = price; } // Sets the price of the part
-    
-    public int getInv() { return inv; } // Returns the current inventory count
-    public void setInv(int inv) { this.inv = inv; } // Sets the current inventory count
-    
-    public int getMin() { return min; } // Returns the minimum inventory level
-    public void setMin(int min) { this.min = min; } // Sets the minimum inventory level
-    
-    public int getMax() { return max; } // Returns the maximum inventory level
-    public void setMax(int max) { this.max = max; } // Sets the maximum inventory level
-    
-    public Set<Product> getProducts() { return products; } // Returns the set of products using this part
-    public void setProducts(Set<Product> products) { this.products = products; } // Sets the collection of products using this part
+    public boolean isInventoryValid() {
+        if (inv == null || minInv == null || maxInv == null) {
+            return false;
+        }
+        return inv >= minInv && inv <= maxInv;
+    }
+    public boolean isMinMaxValid() {
+        if (minInv == null || maxInv == null) {
+            return false;
+        }
+        return maxInv > minInv;
+    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
+    public Integer getInv() { return inv; }
+    public void setInv(Integer inv) { this.inv = inv; }
+    public Integer getMinInv() { return minInv; }
+    public void setMinInv(Integer minInv) { this.minInv = minInv; }
+    public Integer getMaxInv() { return maxInv; }
+    public void setMaxInv(Integer maxInv) { this.maxInv = maxInv; }
 }

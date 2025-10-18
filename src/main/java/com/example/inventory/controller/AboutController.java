@@ -1,12 +1,9 @@
 package com.example.inventory.controller; // Package declaration for controller classes
-
 import org.springframework.stereotype.Controller; // Import for Spring MVC controller annotation
 import org.springframework.ui.Model; // Import for Spring MVC model interface
 import org.springframework.web.bind.annotation.GetMapping; // Import for HTTP GET mapping annotation
-
 @Controller // Marks this class as a Spring MVC controller for handling web requests
 public class AboutController { // Controller class for managing About page requests
-
     @GetMapping("/about") // Maps HTTP GET requests to the /about URL path
     public String showAboutPage(Model model) { // Method to handle About page display requests
         model.addAttribute("shopName", "Alfonso's Auto Parts Shop"); // Adds shop name to the model for template rendering

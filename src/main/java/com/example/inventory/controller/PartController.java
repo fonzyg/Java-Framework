@@ -1,84 +1,56 @@
 package com.example.inventory.controller;
-
+import com.example.inventory.entity.Part;
+import com.example.inventory.service.PartService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.example.inventory.entity.Part;
-import com.example.inventory.service.PartService;
-import com.example.inventory.validation.InventoryValidator;
-
+import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/parts")
 public class PartController {
-
     private final PartService partService;
-    private final InventoryValidator inventoryValidator;
-
-    public PartController(PartService partService, InventoryValidator inventoryValidator) {
+    public PartController(PartService partService) {
         this.partService = partService;
-        this.inventoryValidator = inventoryValidator;
     }
-
     @GetMapping("/add")
-    public String showAddForm(Model model) {
+    public String showAddPartForm(Model model) {
         model.addAttribute("part", new Part());
-        return "partForm";
+        return "addpart";
     }
-
-    @PostMapping("/save")
-    public String savePart(@ModelAttribute("part") Part part, BindingResult bindingResult,
-                          Model model, RedirectAttributes redirectAttributes) {
-        
-        inventoryValidator.validate(part, bindingResult);
-        
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("part", part);
-            return "partForm";
+    @PostMapping("/add")
+    public String addPart(@Valid @ModelAttribute("part") Part part, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "addpart";
         }
-        
-        try {
-            partService.save(part);
-            redirectAttributes.addFlashAttribute("success",
-                    "Part '" + part.getName() + "' saved successfully!");
-            return "redirect:/mainscreen";
-        } catch (Exception e) {
-            model.addAttribute("error", "Error saving part: " + e.getMessage());
-            model.addAttribute("part", part);
-            return "partForm";
+        if (part.getInv() < part.getMinInv() || part.getInv() > part.getMaxInv()) {
+            model.addAttribute("error", "Inventory must be between minimum and maximum values");
+            return "addpart";
         }
+        partService.save(part);
+        return "redirect:/mainscreen";
     }
-
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    public String showEditPartForm(@PathVariable Long id, Model model) {
         Part part = partService.findById(id);
-        
         if (part == null) {
             return "redirect:/mainscreen";
         }
-        
         model.addAttribute("part", part);
-        return "partForm";
+        return "editpart";
     }
-
-    @GetMapping("/delete/{id}")
-    public String deletePart(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        Part part = partService.findById(id);
-        
-        if (part != null) {
-            partService.deleteById(id);
-            redirectAttributes.addFlashAttribute("success",
-                    "Part '" + part.getName() + "' deleted successfully!");
-        } else {
-            redirectAttributes.addFlashAttribute("error", "Part not found.");
+    @PostMapping("/edit/{id}")
+    public String updatePart(@PathVariable Long id, @Valid @ModelAttribute("part") Part part, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "editpart";
         }
-        
+        part.setId(id);
+        partService.save(part);
+        return "redirect:/mainscreen";
+    }
+    @GetMapping("/delete/{id}")
+    public String deletePart(@PathVariable Long id) {
+        partService.deleteById(id);
         return "redirect:/mainscreen";
     }
 }

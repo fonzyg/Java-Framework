@@ -1,67 +1,40 @@
 <!DOCTYPE html>
-<!-- 
-    EDUCATIONAL PURPOSE PROJECT - Alfonso's Auto Parts Shop
-    This template demonstrates Thymeleaf integration with Spring Boot MVC
-    
-    NOTICE FOR TESTERS: This is an educational project designed for learning purposes.
-    Please ensure any testing activities do not affect the project's educational content.
--->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alfonso's Auto Parts Shop - Main Screen</title>
+    <title>Alfonso's Auto Parts Shop - Inventory</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-        h1, h2 { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f4f4f4; }
-        .btn { padding: 8px 16px; margin: 5px; text-decoration: none; background-color: #007bff; color: white; border-radius: 3px; }
-        .btn:hover { background-color: #0056b3; }
-        .alert {
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; }
+        h1 { color: #007bff; text-align: center; margin-bottom: 30px; }
+        .section { margin-bottom: 40px; }
+        .btn { padding: 10px 15px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-warning { background-color: #ffc107; color: black; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; font-weight: bold; }
+        tr:hover { background-color: #f5f5f5; }
+        .actions { white-space: nowrap; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Alfonso's Auto Parts Shop</h1>
-        <p>Welcome to the Inventory Management System</p>
+        <h1>Alfonso's Auto Parts Shop - Inventory</h1>
         
-        <div style="text-align: center; margin: 20px 0;">
-            <a href="/about" class="btn" style="background-color: #28a745;">About Us</a>
-        </div>
-
-        <div th:if="${success}" class="alert alert-success">
-            <span th:text="${success}">Success message</span>
-        </div>
-        
-        <div th:if="${error}" class="alert alert-danger">
-            <span th:text="${error}">Error message</span>
+        <div class="section">
+            <a href="/parts/add" class="btn btn-primary">Add New Part</a>
+            <a href="/products/add" class="btn btn-success">Add New Product</a>
+            <a href="/about" class="btn btn-primary">About Us</a>
         </div>
 
         <div class="section">
             <h2>Parts Inventory</h2>
-            <a href="/parts/add" class="btn">Add New Part</a>
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Price</th>
                         <th>Inventory</th>
@@ -71,16 +44,19 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr th:if="${parts.empty}">
+                        <td colspan="6">No parts available</td>
+                    </tr>
                     <tr th:each="part : ${parts}">
-                        <td th:text="${part.id}">1</td>
-                        <td th:text="${part.name}">Sample Part</td>
-                        <td th:text="'$' + ${part.price}">$10.00</td>
-                        <td th:text="${part.inv}">50</td>
-                        <td th:text="${part.min}">10</td>
-                        <td th:text="${part.max}">100</td>
-                        <td>
-                            <a th:href="@{/parts/edit/{id}(id=${part.id})}" class="btn">Edit</a>
-                            <a th:href="@{/parts/delete/{id}(id=${part.id})}" class="btn">Delete</a>
+                        <td th:text="${part.name}"></td>
+                        <td th:text="'$' + ${part.price}"></td>
+                        <td th:text="${part.inv}"></td>
+                        <td th:text="${part.minInv}"></td>
+                        <td th:text="${part.maxInv}"></td>
+                        <td class="actions">
+                            <a th:href="@{/parts/edit/{id}(id=${part.id})}" class="btn btn-warning">Edit</a>
+                            <a th:href="@{/parts/delete/{id}(id=${part.id})}" class="btn btn-danger" 
+                               onclick="return confirm('Are you sure you want to delete this part?')">Delete</a>
                         </td>
                     </tr>
                 </tbody>
@@ -89,11 +65,9 @@
 
         <div class="section">
             <h2>Products</h2>
-            <a href="/products/add" class="btn">Add New Product</a>
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Price</th>
                         <th>Inventory</th>
@@ -101,15 +75,17 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr th:if="${products.empty}">
+                        <td colspan="4">No products available</td>
+                    </tr>
                     <tr th:each="product : ${products}">
-                        <td th:text="${product.id}">1</td>
-                        <td th:text="${product.name}">Sample Product</td>
-                        <td th:text="'$' + ${product.price}">$25.00</td>
-                        <td th:text="${product.inv}">25</td>
-                        <td>
-                            <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn">Edit</a>
-                            <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn">Delete</a>
-                            <a th:href="@{/products/buy/{id}(id=${product.id})}" class="btn" style="background-color: #28a745;">Buy Now</a>
+                        <td th:text="${product.name}"></td>
+                        <td th:text="'$' + ${product.price}"></td>
+                        <td th:text="${product.inv}"></td>
+                        <td class="actions">
+                            <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-warning">Edit</a>
+                            <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-danger" 
+                               onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
                         </td>
                     </tr>
                 </tbody>
