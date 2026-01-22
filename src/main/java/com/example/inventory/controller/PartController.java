@@ -1,56 +1,72 @@
 package com.example.inventory.controller;
-import com.example.inventory.entity.Part;
-import com.example.inventory.service.PartService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.example.inventory.entity.Part;
+import com.example.inventory.service.PartService;
+
 import jakarta.validation.Valid;
+
 @Controller
 @RequestMapping("/parts")
 public class PartController {
+    
     private final PartService partService;
+    
+    @Autowired
     public PartController(PartService partService) {
         this.partService = partService;
     }
+    
     @GetMapping("/add")
-    public String showAddPartForm(Model model) {
+    public String showAddForm(Model model) {
         model.addAttribute("part", new Part());
         return "addpart";
     }
+    
     @PostMapping("/add")
-    public String addPart(@Valid @ModelAttribute("part") Part part, BindingResult result, Model model) {
+    public String addPart(@Valid @ModelAttribute("part") Part part, 
+                          BindingResult result) {
         if (result.hasErrors()) {
-            return "addpart";
-        }
-        if (part.getInv() < part.getMinInv() || part.getInv() > part.getMaxInv()) {
-            model.addAttribute("error", "Inventory must be between minimum and maximum values");
             return "addpart";
         }
         partService.save(part);
-        return "redirect:/mainscreen";
+        return "redirect:/";
     }
+    
     @GetMapping("/edit/{id}")
-    public String showEditPartForm(@PathVariable Long id, Model model) {
+    public String showEditForm(@PathVariable("id") Long id, Model model) {
         Part part = partService.findById(id);
         if (part == null) {
-            return "redirect:/mainscreen";
+            return "redirect:/";
         }
         model.addAttribute("part", part);
-        return "editpart";
+        return "partForm";
     }
+    
     @PostMapping("/edit/{id}")
-    public String updatePart(@PathVariable Long id, @Valid @ModelAttribute("part") Part part, BindingResult result, Model model) {
+    public String updatePart(@PathVariable("id") Long id, 
+                            @Valid @ModelAttribute("part") Part part,
+                            BindingResult result) {
         if (result.hasErrors()) {
-            return "editpart";
+            return "partForm";
         }
         part.setId(id);
         partService.save(part);
-        return "redirect:/mainscreen";
+        return "redirect:/";
     }
+    
     @GetMapping("/delete/{id}")
-    public String deletePart(@PathVariable Long id) {
+    public String deletePart(@PathVariable("id") Long id) {
         partService.deleteById(id);
-        return "redirect:/mainscreen";
+        return "redirect:/";
     }
 }

@@ -1,11 +1,12 @@
 package com.example.inventory.service;
 
-import com.example.inventory.entity.Product;
-import com.example.inventory.repository.ProductRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.example.inventory.entity.Product;
+import com.example.inventory.repository.ProductRepository;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -36,15 +37,4 @@ public class ProductServiceImpl implements ProductService {
     public void deleteById(Long id) {
         productRepository.deleteById(id);
     }
-}
-
-package com.example.inventory.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import com.example.inventory.entity.Part;
-
-@Repository
-public interface PartRepository extends JpaRepository<Part, Long> {
 }
