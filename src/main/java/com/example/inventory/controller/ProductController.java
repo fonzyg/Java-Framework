@@ -33,12 +33,12 @@ public class ProductController {
             return "redirect:/mainscreen";
         }
         model.addAttribute("product", product);
-        return "editproduct";
+        return "edit-product";
     }
     @PostMapping("/edit/{id}")
     public String updateProduct(@PathVariable Long id, @Valid @ModelAttribute("product") Product product, BindingResult result, Model model) {
         if (result.hasErrors()) {
-            return "editproduct";
+            return "edit-product";
         }
         product.setId(id);
         productService.save(product);

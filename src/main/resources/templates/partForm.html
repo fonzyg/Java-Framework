@@ -89,7 +89,7 @@
             <span th:text="${error}">Error message</span>
         </div>
 
-        <form th:action="@{/parts/save}" th:object="${part}" method="post">
+        <form th:action="@{/parts/edit/{id}(id=${part.id})}" th:object="${part}" method="post">
             <input type="hidden" th:field="*{id}" />
             
             <div class="form-group">
