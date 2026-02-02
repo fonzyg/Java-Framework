@@ -65,10 +65,10 @@ public class PartTest {
         Part part = new Part();
         part.setName("Test Part");
         part.setPrice(10.0);
-        part.setInv(null);
-        part.setMinInv(10);
-        part.setMaxInv(100);
-        
+        part.setInv(50);
+        part.setMinInv(null);
+        part.setMaxInv(null);
+
         assertTrue(part.isInventoryValid());
     }
 

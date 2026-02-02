@@ -23,13 +23,11 @@ public class InventoryValidator implements Validator {
         if (part.getMinInv() > part.getMaxInv()) {
             errors.rejectValue("minInv", "invalid", "Minimum inventory cannot be greater than maximum inventory");
         }
-        if (part.getInv() != null) {
-            if (part.getInv() < part.getMinInv()) {
-                errors.rejectValue("inv", "invalid", "Current inventory cannot be less than minimum inventory (" + part.getMinInv() + ")");
-            }
-            if (part.getInv() > part.getMaxInv()) {
-                errors.rejectValue("inv", "invalid", "Current inventory cannot be greater than maximum inventory (" + part.getMaxInv() + ")");
-            }
+        if (part.getInv() < part.getMinInv()) {
+            errors.rejectValue("inv", "invalid", "Current inventory cannot be less than minimum inventory (" + part.getMinInv() + ")");
+        }
+        if (part.getInv() > part.getMaxInv()) {
+            errors.rejectValue("inv", "invalid", "Current inventory cannot be greater than maximum inventory (" + part.getMaxInv() + ")");
         }
     }
 }
