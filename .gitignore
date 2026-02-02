@@ -29,3 +29,7 @@ bin/
 .DS_Store
 # Project exclude paths
 /target/
+# IDE and AI tool directories
+.claude/
+.vscode/
+.idea/
