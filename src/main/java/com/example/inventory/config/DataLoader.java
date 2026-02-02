@@ -46,9 +46,13 @@ public class DataLoader implements CommandLineRunner {
         Product product1 = new Product("Complete Brake Kit", 199.99, 5);
         Product product2 = new Product("Engine Tune-Up Kit", 129.99, 8);
         Product product3 = new Product("Oil Change Kit", 34.99, 12);
+        Product product4 = new Product("Suspension System", 349.99, 6);
+        Product product5 = new Product("Performance Air Intake Kit", 159.99, 10);
 
         productRepository.save(product1);
         productRepository.save(product2);
         productRepository.save(product3);
+        productRepository.save(product4);
+        productRepository.save(product5);
     }
 }

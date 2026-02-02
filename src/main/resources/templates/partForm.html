@@ -117,18 +117,18 @@
             </div>
             
             <div class="form-group">
-                <label for="min">Minimum Inventory Level:</label>
-                <input type="number" th:field="*{min}" id="min" min="0" required />
-                <div th:if="${#fields.hasErrors('min')}" class="error">
-                    <span th:errors="*{min}">Minimum error</span>
+                <label for="minInv">Minimum Inventory Level:</label>
+                <input type="number" th:field="*{minInv}" id="minInv" min="0" required />
+                <div th:if="${#fields.hasErrors('minInv')}" class="error">
+                    <span th:errors="*{minInv}">Minimum error</span>
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="max">Maximum Inventory Level:</label>
-                <input type="number" th:field="*{max}" id="max" min="0" required />
-                <div th:if="${#fields.hasErrors('max')}" class="error">
-                    <span th:errors="*{max}">Maximum error</span>
+                <label for="maxInv">Maximum Inventory Level:</label>
+                <input type="number" th:field="*{maxInv}" id="maxInv" min="0" required />
+                <div th:if="${#fields.hasErrors('maxInv')}" class="error">
+                    <span th:errors="*{maxInv}">Maximum error</span>
                 </div>
             </div>
             

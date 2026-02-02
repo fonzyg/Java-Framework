@@ -24,7 +24,24 @@ public class Part {
     
     @Min(value = 0, message = "Inventory must be positive")
     private int inv;
-    
+
+    @Min(value = 0, message = "Minimum inventory must be positive")
+    private Integer minInv;
+
+    @Min(value = 0, message = "Maximum inventory must be positive")
+    private Integer maxInv;
+
+    // Constructors
+    public Part() {}
+
+    public Part(String name, double price, int inv, int minInv, int maxInv) {
+        this.name = name;
+        this.price = price;
+        this.inv = inv;
+        this.minInv = minInv;
+        this.maxInv = maxInv;
+    }
+
     // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -37,4 +54,25 @@ public class Part {
     
     public int getInv() { return inv; }
     public void setInv(int inv) { this.inv = inv; }
+
+    public Integer getMinInv() { return minInv; }
+    public void setMinInv(Integer minInv) { this.minInv = minInv; }
+
+    public Integer getMaxInv() { return maxInv; }
+    public void setMaxInv(Integer maxInv) { this.maxInv = maxInv; }
+
+    // Validation methods
+    public boolean isInventoryValid() {
+        if (minInv == null || maxInv == null) {
+            return true;
+        }
+        return inv >= minInv && inv <= maxInv;
+    }
+
+    public boolean isMinMaxValid() {
+        if (minInv == null || maxInv == null) {
+            return true;
+        }
+        return minInv <= maxInv;
+    }
 }
