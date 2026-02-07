@@ -46,7 +46,29 @@
                 <input type="number" th:field="*{inv}" id="inv" required />
                 <div th:if="${#fields.hasErrors('inv')}" class="error" th:errors="*{inv}"></div>
             </div>
-            
+
+            <div class="form-group">
+                <label>Available Parts:</label>
+                <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; background-color: #f9f9f9; max-height: 200px; overflow-y: auto;">
+                    <div th:if="${allParts.empty}">
+                        <p style="color: #666; margin: 0;">No parts available. Please add parts first.</p>
+                    </div>
+                    <div th:each="part : ${allParts}" style="margin-bottom: 10px;">
+                        <label style="font-weight: normal; cursor: pointer; display: flex; align-items: center;">
+                            <input type="checkbox"
+                                   name="partIds"
+                                   th:value="${part.id}"
+                                   th:checked="${product.parts.contains(part)}"
+                                   style="width: auto; margin-right: 10px;" />
+                            <span th:text="${part.name} + ' - $' + ${part.price}"></span>
+                        </label>
+                    </div>
+                </div>
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Select the parts that are included in this product
+                </small>
+            </div>
+
             <div style="text-align: center; margin-top: 30px;">
                 <button type="submit" class="btn btn-primary">Update Product</button>
                 <a href="/mainscreen" class="btn btn-secondary">Cancel</a>
