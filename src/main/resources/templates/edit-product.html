@@ -18,6 +18,9 @@
         .btn:hover { opacity: 0.8; }
         .alert { padding: 15px; margin-bottom: 20px; border-radius: 5px; }
         .alert-danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .parts-list { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; background-color: #f9f9f9; }
+        .parts-list label { font-weight: normal; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; }
+        .parts-list input[type="checkbox"] { width: auto; margin-right: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -46,7 +49,28 @@
                 <input type="number" th:field="*{inv}" id="inv" required />
                 <div th:if="${#fields.hasErrors('inv')}" class="error" th:errors="*{inv}"></div>
             </div>
-            
+
+            <div class="form-group">
+                <label>Available Parts:</label>
+                <div class="parts-list">
+                    <div th:if="${allParts.empty}">
+                        <p style="color: #666; font-style: italic;">No parts available</p>
+                    </div>
+                    <div th:each="part : ${allParts}">
+                        <label>
+                            <input type="checkbox"
+                                   name="partIds"
+                                   th:value="${part.id}"
+                                   th:checked="${product.parts.contains(part)}" />
+                            <span th:text="${part.name} + ' - $' + ${part.price}"></span>
+                        </label>
+                    </div>
+                </div>
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Select the parts that are included in this product
+                </small>
+            </div>
+
             <div style="text-align: center; margin-top: 30px;">
                 <button type="submit" class="btn btn-primary">Update Product</button>
                 <a href="/mainscreen" class="btn btn-secondary">Cancel</a>
