@@ -7,9 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 @Controller
 @RequestMapping("/products")
@@ -29,26 +29,42 @@ public class ProductController {
     }
     @PostMapping("/add")
     public String addProduct(@Valid @ModelAttribute("product") Product product,
-                            @RequestParam(value = "partIds", required = false) List<Long> partIds,
-                            BindingResult result, Model model) {
+                            @RequestParam(value = "partIds", required = false) String partIds,
+                            BindingResult result, Model model,
+                            RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("allParts", partService.findAll());
             return "addproduct";
         }
 
-        // Add selected parts to the product
+        // Add selected parts to the product based on comma-separated IDs
         Set<Part> selectedParts = new HashSet<>();
-        if (partIds != null && !partIds.isEmpty()) {
-            for (Long partId : partIds) {
-                Part part = partService.findById(partId);
-                if (part != null) {
-                    selectedParts.add(part);
+        if (partIds != null && !partIds.trim().isEmpty()) {
+            String[] partIdArray = partIds.split(",");
+            for (String partIdStr : partIdArray) {
+                try {
+                    Long partId = Long.parseLong(partIdStr.trim());
+                    Part part = partService.findById(partId);
+                    if (part != null) {
+                        selectedParts.add(part);
+                    }
+                } catch (NumberFormatException e) {
+                    // Skip invalid IDs
                 }
             }
         }
-        product.setParts(selectedParts);
 
+        // Validation: Check if product has at least one part
+        if (selectedParts.isEmpty()) {
+            model.addAttribute("error", "Not enough Associated Parts! A product must have at least one part.");
+            model.addAttribute("allParts", partService.findAll());
+            return "addproduct";
+        }
+
+        product.setParts(selectedParts);
         productService.save(product);
+
+        redirectAttributes.addFlashAttribute("success", "Product added successfully!");
         return "redirect:/mainscreen";
     }
     @GetMapping("/edit/{id}")
@@ -64,8 +80,9 @@ public class ProductController {
     @PostMapping("/edit/{id}")
     public String updateProduct(@PathVariable Long id,
                                @Valid @ModelAttribute("product") Product product,
-                               @RequestParam(value = "partIds", required = false) List<Long> partIds,
-                               BindingResult result, Model model) {
+                               @RequestParam(value = "partIds", required = false) String partIds,
+                               BindingResult result, Model model,
+                               RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("allParts", partService.findAll());
             return "edit-product";
@@ -73,19 +90,34 @@ public class ProductController {
 
         product.setId(id);
 
-        // Update the product's parts based on selected checkboxes
+        // Update the product's parts based on comma-separated IDs
         Set<Part> selectedParts = new HashSet<>();
-        if (partIds != null && !partIds.isEmpty()) {
-            for (Long partId : partIds) {
-                Part part = partService.findById(partId);
-                if (part != null) {
-                    selectedParts.add(part);
+        if (partIds != null && !partIds.trim().isEmpty()) {
+            String[] partIdArray = partIds.split(",");
+            for (String partIdStr : partIdArray) {
+                try {
+                    Long partId = Long.parseLong(partIdStr.trim());
+                    Part part = partService.findById(partId);
+                    if (part != null) {
+                        selectedParts.add(part);
+                    }
+                } catch (NumberFormatException e) {
+                    // Skip invalid IDs
                 }
             }
         }
-        product.setParts(selectedParts);
 
+        // Validation: Check if product has at least one part
+        if (selectedParts.isEmpty()) {
+            model.addAttribute("error", "Not enough Associated Parts! A product must have at least one part.");
+            model.addAttribute("allParts", partService.findAll());
+            return "edit-product";
+        }
+
+        product.setParts(selectedParts);
         productService.save(product);
+
+        redirectAttributes.addFlashAttribute("success", "Product updated successfully!");
         return "redirect:/mainscreen";
     }
     @GetMapping("/delete/{id}")
